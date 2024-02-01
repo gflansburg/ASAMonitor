@@ -240,7 +240,8 @@ div.RecordDisplay label {
     width: 100%;
 }
 
-div.RecordDisplay span.FieldName, td.FieldName {
+div.RecordDisplay span.FieldName, 
+td.FieldName {
     clear: left;
     width: 30%;
     max-width: 225px;
@@ -280,24 +281,21 @@ div.RecordDisplay span.FieldValue {
 }
 
 @media (max-width: 770px) {
-    span.FormInputField,
-    div.FormInputField,
-    td.FormInputField {
+    div.RecordDisplay span.FieldName,
+    td.FieldName {
         width: 70%;
-        width: calc(70% - 5px);
-        width: -webkit-calc(70% - 5px);
-        width: -moz-calc(70% - 5px);
-        max-width: 770px;
+        width: calc(100% - 125px);
+        width: -webkit-calc(100% - 125px);
+        width: -moz-calc(100% - 125px);
     }
 
+    span.FormInputField,
+    div.FormInputField,
+    td.FormInputField,
     span.FormInputFieldSmall,
     div.FormInputFieldSmall,
     td.FormInputFieldSmall {
-        width: 70%;
-        width: calc(70% - 5px);
-        width: -webkit-calc(70% - 5px);
-        width: -moz-calc(70% - 5px);
-        max-width: 300px;
+        width: 120px;
     }
 
     .modId {

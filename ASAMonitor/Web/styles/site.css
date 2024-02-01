@@ -284,9 +284,9 @@ div.RecordDisplay span.FieldValue {
     div.RecordDisplay span.FieldName,
     td.FieldName {
         width: 70%;
-        width: calc(100% - 125px);
-        width: -webkit-calc(100% - 125px);
-        width: -moz-calc(100% - 125px);
+        width: calc(100% - 108px);
+        width: -webkit-calc(100% - 108px);
+        width: -moz-calc(100% - 108px);
     }
 
     span.FormInputField,
@@ -295,7 +295,7 @@ div.RecordDisplay span.FieldValue {
     span.FormInputFieldSmall,
     div.FormInputFieldSmall,
     td.FormInputFieldSmall {
-        width: 120px;
+        width: 103px;
     }
 
     .modId {

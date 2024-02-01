@@ -138,6 +138,12 @@
                     }
                 }
             });
+            $(".ui-tabs-tab a").on("focus", function () {
+                { ResizeTabs }
+            });
+            $(".ui-tabs-tab a").on("blur", function () {
+                { ResizeTabs }
+            });
             $("#Restart").easyconfirm({ locale: { title: 'Confirm Restart', text: 'Are you sure you wish to restart the server?', button: ['No', 'Yes'] } });
             $("#Restart").click(function () {
                 showBlockingScreen('Restarting Server');

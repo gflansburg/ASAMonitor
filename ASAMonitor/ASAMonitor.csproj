@@ -36,9 +36,6 @@
     <ApplicationIcon>asa.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AjaxControlToolkit, Version=20.1.0.0, Culture=neutral, PublicKeyToken=28f01b0e84b6d53e, processorArchitecture=MSIL">
-      <HintPath>..\packages\AjaxControlToolkit.20.1.0\lib\net40\AjaxControlToolkit.dll</HintPath>
-    </Reference>
     <Reference Include="INIFileParser, Version=2.5.2.0, Culture=neutral, PublicKeyToken=79af7b307b65cf3c, processorArchitecture=MSIL">
       <HintPath>..\packages\ini-parser.2.5.2\lib\net20\INIFileParser.dll</HintPath>
     </Reference>
@@ -213,6 +210,7 @@
     <EmbeddedResource Include="Web\login.html" />
     <EmbeddedResource Include="Web\images\banner.jpg" />
     <EmbeddedResource Include="Web\index.html" />
+    <None Include="README.md" />
     <None Include="Resources\ebb32c51-bda5-419c-8ac5-663b02598084.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

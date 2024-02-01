@@ -222,7 +222,7 @@
                         id: "id"
                     }
                 },
-                pageSize: 4
+                pageSize: $(window).width() <= 800 ? 4 : 3
             });
             $("#grid").kendoGrid({
                 dataSource: dataSource,

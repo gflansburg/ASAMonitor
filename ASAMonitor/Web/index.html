@@ -1,0 +1,2295 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Page-Exit" content="Alpha(opacity=100)" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASA Monitor</title>
+    <style type="text/css">
+        .no-js #loader {
+            display: none;
+        }
+
+        .js #loader {
+            display: block;
+            position: absolute;
+            left: 100px;
+            top: 0;
+        }
+
+        .se-pre-con {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background-color: #000;
+            opacity: 0.6;
+        }
+
+        .nocontent {
+            display: none;
+        }
+    </style>
+    <link type="text/css" rel="stylesheet" href="styles/jquery-ui.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery-ui.structure.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery-ui.theme.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery-confirm.css" />
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jAlert-v4.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery.qtip.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/classic-silver.css" />
+    <link type="text/css" rel="stylesheet" href="styles/site.css" />
+    <link type="text/css" rel="stylesheet" href="styles/buttons.css" />
+    <link type="text/css" rel="stylesheet" href="styles/input.css" />
+    <link type="text/css" rel="stylesheet" href="styles/togglebutton.css" />
+    <script type="text/javascript" src="scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.easy-confirm-dialog.js"></script>
+    <script type="text/javascript" src="scripts/jquery-confirm.js"></script>
+    <script type="text/javascript" src="scripts/kendo.all.min.js"></script>
+    <script type="text/javascript" src="scripts/jszip.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="scripts/jquery.qtip.min.js"></script>
+    <script type="text/javascript" src="scripts/jAlert-v4.js"></script>
+    <script type="text/javascript" src="scripts/jAlert-functions.js"></script>
+    <script type="text/javascript" src="scripts/noty/packaged/jquery.noty.packaged.min.js"></script>
+    <script type="text/javascript">
+        <!--
+        var isBlockingScreen = true;
+        function showBlockingScreen(message) {
+            if (!isBlockingScreen) {
+                isBlockingScreen = true;
+                if (message) {
+                    $.blockUI({ message: '<h3 class=\"uiMessage\"><img src="images/loading.gif" /> ' + message + '...</h3>' });
+                } else {
+                    $(".se-pre-con").show();
+                }
+            }
+        }
+        function hideBlockingScreen() {
+            //if (isBlockingScreen)
+            {
+                // Animate loader off screen
+                isBlockingScreen = false;
+                $(".se-pre-con").fadeOut("fast");;
+                $.unblockUI();
+            }
+        }
+        $(window).ready(function () {
+            hideBlockingScreen();
+        });
+        $(window).on('load', function () {
+            //hideBlockingScreen();
+        });
+        $(window).on('unload', function () {
+            //showBlockingScreen();
+        });
+        var ignore_onbeforeunload = false;
+        $('a[href^=mailto]').on('click', function () {
+            ignore_onbeforeunload = true;
+        });
+        window.addEventListener("beforeunload", function (event) {
+            if (!ignore_onbeforeunload) {
+                showBlockingScreen();
+            }
+            ignore_onbeforeunload = false;
+        });
+        function queueMessage(resultText, resultType) {
+            var n = noty({
+                text: resultText,
+                type: resultType,
+                timeout: 5000,
+                layout: 'topRight',
+                theme: 'defaultTheme',
+                animation: {
+                    open: 'animated bounceInRight', // Animate.css class names
+                    close: 'animated bounceOutRight', // Animate.css class names
+                }
+            });
+        }
+        //-->
+    </script>
+    <script type="text/javascript">
+        $(window).on('resize', function () {
+            { ResizeTabs }
+        });
+        function resizeTabs() {
+            if ($(window).width() <= 800) {
+                $(".thirdPartyMod").hide();
+            } else {
+                $(".thirdPartyMod").show();
+            }
+            $(".tabPage").height($(window).height() - $("#header").height() - $("#footer").height() - $(".ui-tabs-nav").height() - 60);
+        }
+        $(document).ready(function () {
+            setInterval(checkStatus, 1000);
+            $("#tabs").tabs({
+                activate: function (event, ui) {
+                    $("#formConfig").attr("action", "/index.html#tab-" + ui.newTab.index());
+                },
+                create: function (event, ui) {
+                    { ResizeTabs }
+                    $(".tabPage").height($(window).height() - $("#header").height() - $("#footer").height() - $(".ui-tabs-nav").height() - 60);
+                    var hash = window.location.hash;
+                    if (hash) {
+                        $("#formConfig").attr("action", "/index.html" + hash);
+                    }
+                }
+            });
+            $("#Restart").easyconfirm({ locale: { title: 'Confirm Restart', text: 'Are you sure you wish to restart the server?', button: ['No', 'Yes'] } });
+            $("#Restart").click(function () {
+                showBlockingScreen('Restarting Server');
+            });
+            var buttons = $('.DeleteMod');
+            buttons.each(function () {
+                var id = $(this).attr('data-uid');
+                var name = $(this).attr('data-name');
+                $(this).easyconfirm({ locale: { title: 'Confirm Removal', text: 'Are you sure you wish to remove this mod: ' + name + '?', button: ['No', 'Yes'] } });
+                $(this).click(function (e) {
+                    document.getElementById("DeleteModId").value = id;
+                    showBlockingScreen('Removing Mod');
+                });
+            });
+            $("#BrowseMods").click(function (e) {
+                $("#formConfig").attr("action", "/modslist.html");
+            });
+            var checked = false;
+            $("#Save").click(function (e) {
+                if (!checked && $("#Start").is(':checked') === true) {
+                    checked = true;
+                    $.confirm({
+                        boxWidth: '300px',
+                        useBootstrap: false,
+                        animation: 'none',
+                        closeAnimation: 'none',
+                        title: 'Restart Server',
+                        content: 'Do you wish to restart the server after applying the changes?',
+                        buttons: {
+                            Yes: function () {
+                                document.getElementById("RestartOnSave").value = 'true';
+                                showBlockingScreen('Saving');
+                                $("#Save").click();
+                            },
+                            No: function () {
+                                showBlockingScreen('Saving');
+                                $("#Save").click();
+                            }
+                        }
+                    });
+                    return false;
+                }
+                showBlockingScreen('Saving');
+                return true;
+            });
+            $("#Start").click(function (e) {
+                e.preventDefault();
+                if ($("#Start").is(':checked') === false) {
+                    $("#Start").prop('checked', true);
+                    $.confirm({
+                        boxWidth: '300px',
+                        useBootstrap: false,
+                        animation: 'none',
+                        closeAnimation: 'none',
+                        title: 'Confirm Stop',
+                        content: 'Are you sure you wish to stop the server?',
+                        buttons: {
+                            Yes: function () {
+                                $("#Start").prop('checked', false);
+                                showBlockingScreen('Stopping The Server');
+                                $("#formConfig").submit();
+                            },
+                            No: function () {
+                            }
+                        }
+                    });
+                }
+                else {
+                    $("#Start").prop('checked', true);
+                    showBlockingScreen('Starting The Server');
+                    $("#formConfig").submit();
+                }
+            });
+            $("#AddModId").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: 'searchMods.html',
+                        datatype: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (val, item) {
+                                return {
+                                    label: val.displayName,
+                                    value: val.id,
+                                    title: val.name,
+                                    category: val.category,
+                                    summary: val.summary,
+                                    logo: val.logo
+                                }
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    $("#AddModName").html(ui.item.title);
+                    $("#AddModCategory").html(ui.item.category);
+                    $("#AddModSummary").html(ui.item.summary);
+                    $("#AddModLogo").attr("src", ui.item.logo);
+                    $("#AddModName").show();
+                    $("#AddModCategory").show();
+                    $("#AddModSummary").show();
+                    if (ui.item.logo !== '') {
+                        $("#AddModLogo").show();
+                    } else {
+                        $("#AddModLogo").hide();
+                    }
+                },
+                change: function (event, ui) {
+                    var modId = $(this).val();
+                    $.ajax({
+                        url: 'searchMods.html',
+                        datatype: "json",
+                        data: {
+                            term: modId
+                        },
+                        success: function (data) {
+                            if (data.length > 0) {
+                                if (data[0].id !== parseInt(modId)) {
+                                    $("#AddModId").val("");
+                                    $("#AddModName").hide();
+                                    $("#AddModCategory").hide();
+                                    $("#AddModSummary").hide();
+                                    $("#AddModLogo").hide();
+                                } else {
+                                    $("#AddModName").html(data[0].name);
+                                    $("#AddModCategory").html(data[0].category);
+                                    $("#AddModSummary").html(data[0].summary);
+                                    $("#AddModLogo").attr("src", data[0].logo);
+                                    $("#AddModName").show();
+                                    $("#AddModCategory").show();
+                                    $("#AddModSummary").show();
+                                    if (data[0].logo !== '') {
+                                        $("#AddModLogo").show();
+                                    } else {
+                                        $("#AddModLogo").hide();
+                                    }
+                                }
+                            } else {
+                                $("#AddModId").val("");
+                                $("#AddModName").hide();
+                                $("#AddModCategory").hide();
+                                $("#AddModSummary").hide();
+                                $("#AddModLogo").hide();
+                            }
+                        },
+                        error: function (data) {
+                            $("#AddModId").val("");
+                            $("#AddModName").hide();
+                            $("#AddModCategory").hide();
+                            $("#AddModSummary").hide();
+                            $("#AddModLogo").hide();
+                        }
+                    });
+                }
+            });
+        });
+        function checkStatus() {
+            $.ajax({
+                url: 'getStatus.html',
+                datatype: "json",
+                success: function (data) {
+                    $("#ServerStarted").val(data.ServerStarted);
+                    $("#Start").prop('checked', !data.Paused);
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <div class="se-pre-con"></div>
+    <div id="siteWrapper">
+        <div id="header">
+            <img id="logo" src="images/banner.jpg" style="width: 100%" />
+            <br />
+            <br />
+            <div class="contentMain"><div id="title" class="groupBox"><span>Configuration</span></div></div>
+        </div>
+        <div class="contentMain">
+            <form id="formConfig" method="post" action="/index.html">
+                <input type="hidden" name="ServerStarted" id="ServerStarted" value="{ServerStarted}" />
+                <input type="hidden" name="RestartOnSave" id="RestartOnSave" value="false" />
+                <div id="tabs">
+                    <ul>
+                        <li><a href="#tab-0">Server Config</a></li>
+                        <li><a href="#tab-1">GameUserSettings.INI</a></li>
+                        <li><a href="#tab-2">Game.INI</a></li>
+                        <li><a href="#tab-3">Mods</a></li>
+                        {CustomTabs}
+                    </ul>
+                    <div id="tab-0" class="tabPage">
+                        <div class="form-horizontal">
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="Start">Start Server:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="Start" name="Start" type="checkbox" {Started} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="NoBattleEye">No Battle Eye:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="NoBattleEye" name="NoBattleEye" type="checkbox" {NoBattleEye} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="WinLiveMaxPlayers">Max Players:</label></span>
+                                    <span class="FormInputField">
+                                        <input type="number" min="1" max="100" id="WinLiveMaxPlayers" name="WinLiveMaxPlayers" value="{WinLiveMaxPlayers}" />
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="SessionName">Server Name:</label></span>
+                                    <span class="FormInputField">
+                                        <input type="text" id="SessionName" name="SessionName" value="{SessionName}" />
+                                    </span>
+                                </label>
+                            </div>
+
+                            {Passwords}
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="RCONEnabled">RCON Enabled:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="RCONEnabled" name="RCONEnabled" type="checkbox" {RCONEnabled} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="RCONEnabled">RCON Port:</label></span>
+                                    <span class="FormInputField">
+                                        <input type="number" min="1" step="1" id="RCONPort" name="RCONPort" value="{RCONPort}" />
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="RCONServerGameLogBuffer">RCON Server Game Log Buffer:</label></span>
+                                    <span class="FormInputField">
+                                        <input type="number" min="1" step="1" id="RCONServerGameLogBuffer" name="RCONServerGameLogBuffer" value="{RCONServerGameLogBuffer}" />
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MessageOfTheDay">Message of The Day:</label></span>
+                                    <span class="FormInputField">
+                                        <input type="text" id="MessageOfTheDay" name="MessageOfTheDay" value="{MessageOfTheDay}" />
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MessageDuration">Message Duration:</label></span>
+                                    <span class="FormInputField">
+                                        <input type="number" min="0" step="1" id="MessageDuration" name="MessageDuration" value="{MessageDuration}" />
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-1" class="tabPage">
+
+                        <div class="form-horizontal">
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ServerPVE">Server PVE:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ServerPVE" name="ServerPVE" type="checkbox" {ServerPVE} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ServerHardcore">Server Hardcore:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ServerHardcore" name="ServerHardcore" type="checkbox" {ServerHardcore} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ForceAllowCaveFlyers">Force Allow Cave Flyers:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ForceAllowCaveFlyers" name="ForceAllowCaveFlyers" type="checkbox" {ForceAllowCaveFlyers} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ShowMapPlayerLocation">Show Map Player Location:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ShowMapPlayerLocation" name="ShowMapPlayerLocation" type="checkbox" {ShowMapPlayerLocation} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowThirdPersonPlayer">Allow Third Person Player:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowThirdPersonPlayer" name="AllowThirdPersonPlayer" type="checkbox" {AllowThirdPersonPlayer} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="NoTributeDownloads">No Tribute Downloads:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="NoTributeDownloads" name="NoTributeDownloads" type="checkbox" {NoTributeDownloads} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OnlyAllowSpecifiedEngrams">Only Allow Specified Engrams:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="OnlyAllowSpecifiedEngrams" name="OnlyAllowSpecifiedEngrams" type="checkbox" {OnlyAllowSpecifiedEngrams} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ServerForceNoHUD">Server Force No HUD:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ServerForceNoHUD" name="ServerForceNoHUD" type="checkbox" {ServerForceNoHUD} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="GlobalVoiceChat">Global Voice Chat:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="GlobalVoiceChat" name="GlobalVoiceChat" type="checkbox" {GlobalVoiceChat} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ProximityChat">Proximity Chat:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ProximityChat" name="ProximityChat" type="checkbox" {ProximityChat} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="FastDecayUnsnappedCoreStructures">Fast Decay Unsnapped Core Structures:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="FastDecayUnsnappedCoreStructures" name="FastDecayUnsnappedCoreStructures" type="checkbox" {FastDecayUnsnappedCoreStructures} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OverrideStructurePlatformPrevention">Override Structure Platform Prevention:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="OverrideStructurePlatformPrevention" name="OverrideStructurePlatformPrevention" type="checkbox" {OverrideStructurePlatformPrevention} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowAnyoneBabyImprintCuddle">Allow Anyone Baby Imprint Cuddle:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowAnyoneBabyImprintCuddle" name="AllowAnyoneBabyImprintCuddle" type="checkbox" {AllowAnyoneBabyImprintCuddle} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableImprintDinoBuff">Disable Imprint Dino Buff:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableImprintDinoBuff" name="DisableImprintDinoBuff" type="checkbox" {DisableImprintDinoBuff} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvPDinoDecay">PvP Dino Decay:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PvPDinoDecay" name="PvPDinoDecay" type="checkbox" {PvPDinoDecay} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OnlyAutoDestroyCoreStructures">Only Auto Destroy Core Structures:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="OnlyAutoDestroyCoreStructures" name="OnlyAutoDestroyCoreStructures" type="checkbox" {OnlyAutoDestroyCoreStructures} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvPStructureDecay">PvP Structure Decay:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PvPStructureDecay" name="PvPStructureDecay" type="checkbox" {PvPStructureDecay} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ClampItemSpoilingTimes">Clamp Item Spoiling Times:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ClampItemSpoilingTimes" name="ClampItemSpoilingTimes" type="checkbox" {ClampItemSpoilingTimes} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ClampItemStats">Clamp Item Stats:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ClampItemStats" name="ClampItemStats" type="checkbox" {ClampItemStats} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AutoDestroyDecayedDinos">Auto Destroy Decayed Dinos:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AutoDestroyDecayedDinos" name="AutoDestroyDecayedDinos" type="checkbox" {AutoDestroyDecayedDinos} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventTribeAlliances">Prevent Tribe Alliances:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventTribeAlliances" name="PreventTribeAlliances" type="checkbox" {PreventTribeAlliances} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ServerCrosshair">Server Crosshair:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ServerCrosshair" name="ServerCrosshair" type="checkbox" {ServerCrosshair} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ShowFloatingDamageText">Show Floating Damage Text:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ShowFloatingDamageText" name="ShowFloatingDamageText" type="checkbox" {ShowFloatingDamageText} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowHideDamageSourceFromLogs">Allow Hide Damage Source From Logs:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowHideDamageSourceFromLogs" name="AllowHideDamageSourceFromLogs" type="checkbox" {AllowHideDamageSourceFromLogs} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowRaidDinoFeeding">Allow Raid Dino Feeding:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowRaidDinoFeeding" name="AllowRaidDinoFeeding" type="checkbox" {AllowRaidDinoFeeding} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="EnableExtraStructurePreventionVolumes">Enable Extra Structure Prevention Volumes:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="EnableExtraStructurePreventionVolumes" name="EnableExtraStructurePreventionVolumes" type="checkbox" {EnableExtraStructurePreventionVolumes} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventSpawnAnimations">Prevent Spawn Animations:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventSpawnAnimations" name="PreventSpawnAnimations" type="checkbox" {PreventSpawnAnimations} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CrossARKAllowForeignDinoDownloads">Cross ARK Allow Foreign Dino Downloads:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="CrossARKAllowForeignDinoDownloads" name="CrossARKAllowForeignDinoDownloads" type="checkbox" {CrossARKAllowForeignDinoDownloads} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventDiseases">Prevent Diseases:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventDiseases" name="PreventDiseases" type="checkbox" {PreventDiseases} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="NonPermanentDiseases">Non-Permanent Diseases:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="NonPermanentDiseases" name="NonPermanentDiseases" type="checkbox" {NonPermanentDiseases} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="TribeLogDestroyedEnemyStructures">Tribe Log Destroyed Enemy Structures:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="TribeLogDestroyedEnemyStructures" name="TribeLogDestroyedEnemyStructures" type="checkbox" {TribeLogDestroyedEnemyStructures} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvEAllowStructuresAtSupplyDrops">PvE Allow Structures at Supply Drops:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PvEAllowStructuresAtSupplyDrops" name="PvEAllowStructuresAtSupplyDrops" type="checkbox" {PvEAllowStructuresAtSupplyDrops} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="UseOptimizedHarvestingHealth">Use Optimized Harvesting Health:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="UseOptimizedHarvestingHealth" name="UseOptimizedHarvestingHealth" type="checkbox" {UseOptimizedHarvestingHealth} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowMultipleAttachedC4">Allow Multiple Attached C4:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowMultipleAttachedC4" name="AllowMultipleAttachedC4" type="checkbox" {AllowMultipleAttachedC4} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowFlyingStaminaRecovery">Allow Flying Stamina Recovery:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowFlyingStaminaRecovery" name="AllowFlyingStaminaRecovery" type="checkbox" {AllowFlyingStaminaRecovery} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowHitMarkers">Allow Hit Markers:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowHitMarkers" name="AllowHitMarkers" type="checkbox" {AllowHitMarkers} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventDownloadSurvivors">Prevent Download Survivors:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventDownloadSurvivors" name="PreventDownloadSurvivors" type="checkbox" {PreventDownloadSurvivors} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventDownloadItems">Prevent Download Items:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventDownloadItems" name="PreventDownloadItems" type="checkbox" {PreventDownloadItems} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventDownloadDinos">Prevent Download Dinos:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventDownloadDinos" name="PreventDownloadDinos" type="checkbox" {PreventDownloadDinos} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventUploadSurvivors">Prevent Upload Survivors:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventUploadSurvivors" name="PreventUploadSurvivors" type="checkbox" {PreventUploadSurvivors} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventUploadItems">Prevent Upload Items:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventUploadItems" name="PreventUploadItems" type="checkbox" {PreventUploadItems} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventUploadDinos">Prevent Upload Dinos:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventUploadDinos" name="PreventUploadDinos" type="checkbox" {PreventUploadDinos} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowCrateSpawnsOnTopOfStructures">Allow Crate Spawns On Top of Structures:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowCrateSpawnsOnTopOfStructures" name="AllowCrateSpawnsOnTopOfStructures" type="checkbox" {AllowCrateSpawnsOnTopOfStructures} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="EnableCryopodNerf">Enable Cryopod Nerf:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="EnableCryopodNerf" name="EnableCryopodNerf" type="checkbox" {EnableCryopodNerf} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowFlyerCarryPvE">Allow Flyer Carry PvE:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowFlyerCarryPvE" name="AllowFlyerCarryPvE" type="checkbox" {AllowFlyerCarryPvE} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AlwaysAllowStructurePickup">Always Allow Structure Pickup:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AlwaysAllowStructurePickup" name="AlwaysAllowStructurePickup" type="checkbox" {AlwaysAllowStructurePickup} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DontAlwaysNotifyPlayerJoined">Dont Always Notify Player Joined:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DontAlwaysNotifyPlayerJoined" name="DontAlwaysNotifyPlayerJoined" type="checkbox" {DontAlwaysNotifyPlayerJoined} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AlwaysNotifyPlayerLeft">Always Notify Player Left:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AlwaysNotifyPlayerLeft" name="AlwaysNotifyPlayerLeft" type="checkbox" {AlwaysNotifyPlayerLeft} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="JoinNotifications">Join Notifications:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="JoinNotifications" name="JoinNotifications" type="checkbox" {JoinNotifications} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ShowStatusNotificationMessages">Show Status Notification Messages:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ShowStatusNotificationMessages" name="ShowStatusNotificationMessages" type="checkbox" {ShowStatusNotificationMessages} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisablePvEGamma">Disable PvE Gamma:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisablePvEGamma" name="DisablePvEGamma" type="checkbox" {DisablePvEGamma} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableDinoDecayPvE">Disable Dino Decay PvE:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableDinoDecayPvE" name="DisableDinoDecayPvE" type="checkbox" {DisableDinoDecayPvE} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AdminLogging">Admin Logging:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AdminLogging" name="AdminLogging" type="checkbox" {AdminLogging} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="EnableDeathTeamSpectator">Enable Death Team Spectator:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="EnableDeathTeamSpectator" name="EnableDeathTeamSpectator" type="checkbox" {EnableDeathTeamSpectator} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowCryoFridgeOnSaddle">Allow Cryo Fridge On Saddle:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowCryoFridgeOnSaddle" name="AllowCryoFridgeOnSaddle" type="checkbox" {AllowCryoFridgeOnSaddle} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableCryopodEnemyCheck">Disable Cryopod Enemy Check:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableCryopodEnemyCheck" name="DisableCryopodEnemyCheck" type="checkbox" {DisableCryopodEnemyCheck} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableCryopodFridgeRequirement">Disable Cryopod Fridge Requirement:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableCryopodFridgeRequirement" name="DisableCryopodFridgeRequirement" type="checkbox" {DisableCryopodFridgeRequirement} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="EnableCryoSicknessPVE">Enable Cryo Sickness PVE:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="EnableCryoSicknessPVE" name="EnableCryoSicknessPVE" type="checkbox" {EnableCryoSicknessPVE} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CryopodNerfDuration">Cryopod Nerf Duration:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="CryopodNerfDuration" name="CryopodNerfDuration" value="{CryopodNerfDuration}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CryopodNerfDamageMult">Cryopod Nerf Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CryopodNerfDamageMult" name="CryopodNerfDamageMult" value="{CryopodNerfDamageMult}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CryopodNerfIncomingDamageMultPercent">Cryopod Nerf Incoming Damage Multiplier Percent:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="CryopodNerfIncomingDamageMultPercent" name="CryopodNerfIncomingDamageMultPercent" value="{CryopodNerfIncomingDamageMultPercent}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventOfflinePvP">Prevent Offline PvP:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PreventOfflinePvP" name="PreventOfflinePvP" type="checkbox" {PreventOfflinePvP} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PreventOfflinePvPInterval">Prevent Offline PvP Interval:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="PreventOfflinePvPInterval" name="PreventOfflinePvPInterval" value="{PreventOfflinePvPInterval}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ImplantSuicideCD">Implant Suicide CD:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="1" step="1" id="ImplantSuicideCD" name="ImplantSuicideCD" value="{ImplantSuicideCD}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BattleNumOfTribesToStartGame">Battle Num of Tribes To Start Game:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="1" step="1" id="BattleNumOfTribesToStartGame" name="BattleNumOfTribesToStartGame" value="{BattleNumOfTribesToStartGame}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="TimeToCollapseROD">Time To Collapse ROD:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="TimeToCollapseROD" name="TimeToCollapseROD" value="{TimeToCollapseROD}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BattleAutoStartGameInterval">Battle Auto Start Game Interval:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BattleAutoStartGameInterval" name="BattleAutoStartGameInterval" value="{BattleAutoStartGameInterval}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BattleAutoRestartGameInterval">Battle Auto Restart Game Interval:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BattleAutoRestartGameInterval" name="BattleAutoRestartGameInterval" value="{BattleAutoRestartGameInterval}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BattleSuddenDeathInterval">Battle Sudden Death Interval:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BattleSuddenDeathInterval" name="BattleSuddenDeathInterval" value="{BattleSuddenDeathInterval}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="NewMaxStructuresInRange">New Max Structures In Range:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="NewMaxStructuresInRange" name="NewMaxStructuresInRange" value="{NewMaxStructuresInRange}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="XPMultiplier">XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="XPMultiplier" name="XPMultiplier" value="{XPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DayCycleSpeedScale">Day Cycle Speed Scale:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DayCycleSpeedScale" name="DayCycleSpeedScale" value="{DayCycleSpeedScale}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DayTimeSpeedScale">Day Time Speed Scale:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DayTimeSpeedScale" name="DayTimeSpeedScale" value="{DayTimeSpeedScale}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="NightTimeSpeedScale">Night Time Speed Scale:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="NightTimeSpeedScale" name="NightTimeSpeedScale" value="{NightTimeSpeedScale}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StartTimeHour">Start Time Hour:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="-1" step="1" id="StartTimeHour" name="StartTimeHour" value="{StartTimeHour}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="TribeNameChangeCooldown">Tribe Name Change Cooldown:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="TribeNameChangeCooldown" name="TribeNameChangeCooldown" value="{TribeNameChangeCooldown}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StructurePickupTimeAfterPlacement">Structure Pickup Time After Placement:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="StructurePickupTimeAfterPlacement" name="StructurePickupTimeAfterPlacement" value="{StructurePickupTimeAfterPlacement}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StructurePickupHoldDuration">Structure Pickup Hold Duration:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="StructurePickupHoldDuration" name="StructurePickupHoldDuration" value="{StructurePickupHoldDuration}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MaxPlatformSaddleStructureLimit">Max Platform Saddle Structure Limit:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="1" min="1" id="MaxPlatformSaddleStructureLimit" name="MaxPlatformSaddleStructureLimit" value="{MaxPlatformSaddleStructureLimit}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MaxTamedDinos">Max Tamed Dinos:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="1" min="1" id="MaxTamedDinos" name="MaxTamedDinos" value="{MaxTamedDinos}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MaxTamedDinos_SoftTameLimit">Max Tamed Dinos Soft Tame Limit:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="1" min="1" id="MaxTamedDinos_SoftTameLimit" name="MaxTamedDinos_SoftTameLimit" value="{MaxTamedDinos_SoftTameLimit}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration">Max Tamed Dinos Soft Tame Limit Countdown For Deletion Duration:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="1" min="1" id="MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration" name="MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration" value="{MaxTamedDinos_SoftTameLimit_CountdownForDeletionDuration}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AutoSavePeriodMinutes">Auto Save Period Minutes:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="1" min="1" id="AutoSavePeriodMinutes" name="AutoSavePeriodMinutes" value="{AutoSavePeriodMinutes}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="KickIdlePlayersPeriod">Kick Idle Players Period:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="KickIdlePlayersPeriod" name="KickIdlePlayersPeriod" value="{KickIdlePlayersPeriod}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DifficultyOffset">Difficulty Offset:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DifficultyOffset" name="DifficultyOffset" value="{DifficultyOffset}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OverrideOfficialDifficulty">Override Official Difficulty:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="OverrideOfficialDifficulty" name="OverrideOfficialDifficulty" value="{OverrideOfficialDifficulty}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="TamingSpeedMultiplier">Taming Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="TamingSpeedMultiplier" name="TamingSpeedMultiplier" value="{TamingSpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OxygenSwimSpeedStatMultiplier">Oxygen Swim Speed Stat Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="OxygenSwimSpeedStatMultiplier" name="OxygenSwimSpeedStatMultiplier" value="{OxygenSwimSpeedStatMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StructurePreventResourceRadiusMultiplier">Structure Prevent Resource Radius Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="StructurePreventResourceRadiusMultiplier" name="StructurePreventResourceRadiusMultiplier" value="{StructurePreventResourceRadiusMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlatformSaddleBuildAreaBoundsMultiplier">Platform Saddle Build Area Bounds Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlatformSaddleBuildAreaBoundsMultiplier" name="PlatformSaddleBuildAreaBoundsMultiplier" value="{PlatformSaddleBuildAreaBoundsMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="RaidDinoCharacterFoodDrainMultiplier">Raid Dino Character Food Drain Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="RaidDinoCharacterFoodDrainMultiplier" name="RaidDinoCharacterFoodDrainMultiplier" value="{RaidDinoCharacterFoodDrainMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvEDinoDecayPeriodMultiplier">PvE Dino Decay Period Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PvEDinoDecayPeriodMultiplier" name="PvEDinoDecayPeriodMultiplier" value="{PvEDinoDecayPeriodMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ItemStackSizeMultiplier">Item Stack Size Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="ItemStackSizeMultiplier" name="ItemStackSizeMultiplier" value="{ItemStackSizeMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="HarvestAmountMultiplier">Harvest Amount Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="HarvestAmountMultiplier" name="HarvestAmountMultiplier" value="{HarvestAmountMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="HarvestHealthMultiplier">Harvest Health Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="HarvestHealthMultiplier" name="HarvestHealthMultiplier" value="{HarvestHealthMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoDamageMultiplier">Dino Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoDamageMultiplier" name="DinoDamageMultiplier" value="{DinoDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerDamageMultiplier">Player Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerDamageMultiplier" name="PlayerDamageMultiplier" value="{PlayerDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StructureDamageMultiplier">Structure Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="StructureDamageMultiplier" name="StructureDamageMultiplier" value="{StructureDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoResistanceMultiplier">Dino Resistance Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoResistanceMultiplier" name="DinoResistanceMultiplier" value="{DinoResistanceMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerResistanceMultiplier">Player Resistance Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerResistanceMultiplier" name="PlayerResistanceMultiplier" value="{PlayerResistanceMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StructureResistanceMultiplier">Structure Resistance Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="StructureResistanceMultiplier" name="StructureResistanceMultiplier" value="{StructureResistanceMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvEStructureDecayPeriodMultiplier">PvE Structure Decay Period Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PvEStructureDecayPeriodMultiplier" name="PvEStructureDecayPeriodMultiplier" value="{PvEStructureDecayPeriodMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ResourcesRespawnPeriodMultiplier">Resources Respawn Period Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="ResourcesRespawnPeriodMultiplier" name="ResourcesRespawnPeriodMultiplier" value="{ResourcesRespawnPeriodMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerCharacterWaterDrainMultiplier">Player Character Water Drain Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerCharacterWaterDrainMultiplier" name="PlayerCharacterWaterDrainMultiplier" value="{PlayerCharacterWaterDrainMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerCharacterFoodDrainMultiplier">Player Character Food Drain Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerCharacterFoodDrainMultiplier" name="PlayerCharacterFoodDrainMultiplier" value="{PlayerCharacterFoodDrainMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoCharacterFoodDrainMultiplier">Dino Character Food Drain Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoCharacterFoodDrainMultiplier" name="DinoCharacterFoodDrainMultiplier" value="{DinoCharacterFoodDrainMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerCharacterStaminaDrainMultiplier">Player Character Stamina Drain Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerCharacterStaminaDrainMultiplier" name="PlayerCharacterStaminaDrainMultiplier" value="{PlayerCharacterStaminaDrainMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoCharacterStaminaDrainMultiplier">Dino Character Stamina Drain Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoCharacterStaminaDrainMultiplier" name="DinoCharacterStaminaDrainMultiplier" value="{DinoCharacterStaminaDrainMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerCharacterHealthRecoveryMultiplier">Player Character Health Recovery Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerCharacterHealthRecoveryMultiplier" name="PlayerCharacterHealthRecoveryMultiplier" value="{PlayerCharacterHealthRecoveryMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoCharacterHealthRecoveryMultiplier">Dino Character Health Recovery Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoCharacterHealthRecoveryMultiplier" name="DinoCharacterHealthRecoveryMultiplier" value="{DinoCharacterHealthRecoveryMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoCountMultiplier">Dino Count Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoCountMultiplier" name="DinoCountMultiplier" value="{DinoCountMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-2" class="tabPage">
+                        <div class="form-horizontal">
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MaxDifficulty">Max Difficulty:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="MaxDifficulty" name="MaxDifficulty" type="checkbox" {MaxDifficulty} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisablePhotoMode">Disable Photo Mode:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisablePhotoMode" name="DisablePhotoMode" type="checkbox" {DisablePhotoMode} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="IncreasePvPRespawnInterval">Increase PvP Respawn Interval:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="IncreasePvPRespawnInterval" name="IncreasePvPRespawnInterval" type="checkbox" {IncreasePvPRespawnInterval} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AutoPvETimer">Auto PvE Timer:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AutoPvETimer" name="AutoPvETimer" type="checkbox" {AutoPvETimer} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AutoPvETimer">Auto PvE Use System Time:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AutoPvEUseSystemTime" name="AutoPvEUseSystemTime" type="checkbox" {AutoPvEUseSystemTime} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableFriendlyFire">Disable Friendly Fire:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableFriendlyFire" name="DisableFriendlyFire" type="checkbox" {DisableFriendlyFire} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="FlyerPlatformAllowUnalignedDinoBasing">Flyer Platform Allow Unaligned Dino Basing:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="FlyerPlatformAllowUnalignedDinoBasing" name="FlyerPlatformAllowUnalignedDinoBasing" type="checkbox" {FlyerPlatformAllowUnalignedDinoBasing} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableLootCrates">Disable Loot Crates:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableLootCrates" name="DisableLootCrates" type="checkbox" {DisableLootCrates} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowCustomRecipes">Allow Custom Recipes:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowCustomRecipes" name="AllowCustomRecipes" type="checkbox" {AllowCustomRecipes} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PassiveDefensesDamageRiderlessDinos">Passive Defenses Damage Riderless Dinos:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PassiveDefensesDamageRiderlessDinos" name="PassiveDefensesDamageRiderlessDinos" type="checkbox" {PassiveDefensesDamageRiderlessDinos} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvEAllowTribeWar">PvE Allow Tribe War:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PvEAllowTribeWar" name="PvEAllowTribeWar" type="checkbox" {PvEAllowTribeWar} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvEAllowTribeWar">PvE Allow Tribe War Cancel:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="PvEAllowTribeWarCancel" name="PvEAllowTribeWarCancel" type="checkbox" {PvEAllowTribeWarCancel} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="UseSingleplayerSettings">Use Single player Settings:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="UseSingleplayerSettings" name="UseSingleplayerSettings" type="checkbox" {UseSingleplayerSettings} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="UseCorpseLocator">Use Corpse Locator:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="UseCorpseLocator" name="UseCorpseLocator" type="checkbox" {UseCorpseLocator} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ShowCreativeMode">Show Creative Mode:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="ShowCreativeMode" name="ShowCreativeMode" type="checkbox" {ShowCreativeMode} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="HardLimitTurretsInRange">Hard Limit Turrets In Range:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="HardLimitTurretsInRange" name="HardLimitTurretsInRange" type="checkbox" {HardLimitTurretsInRange} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableStructurePlacementCollision">Disable Structure Placement Collision:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableStructurePlacementCollision" name="DisableStructurePlacementCollision" type="checkbox" {DisableStructurePlacementCollision} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowPlatformSaddleMultiFloors">Allow Platform Saddle Multi Floors:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowPlatformSaddleMultiFloors" name="AllowPlatformSaddleMultiFloors" type="checkbox" {AllowPlatformSaddleMultiFloors} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowUnlimitedRespecs">Allow Unlimited Respecs:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowUnlimitedRespecs" name="AllowUnlimitedRespecs" type="checkbox" {AllowUnlimitedRespecs} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableDinoTaming">Disable Dino Taming:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableDinoTaming" name="DisableDinoTaming" type="checkbox" {DisableDinoTaming} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DisableDinoRiding">Disable Dino Riding:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="DisableDinoRiding" name="DisableDinoRiding" type="checkbox" {DisableDinoRiding} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowSpeedLeveling">Allow Speed Leveling:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowSpeedLeveling" name="AllowSpeedLeveling" type="checkbox" {AllowSpeedLeveling} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AllowFlyerSpeedLeveling">Allow Flyer Speed Leveling:</label></span>
+                                    <div class="FormInputField">
+                                        <div class="toggleButton">
+                                            <label><input id="AllowFlyerSpeedLeveling" name="AllowFlyerSpeedLeveling" type="checkbox" {AllowFlyerSpeedLeveling} /><span></span></label>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="StructureDamageRepairCooldown">Structure Damage Repair Cooldown:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="StructureDamageRepairCooldown" name="StructureDamageRepairCooldown" value="{StructureDamageRepairCooldown}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="IncreasePvPRespawnIntervalCheckPeriod">Increase PvP Respawn Interval Check Period:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="IncreasePvPRespawnIntervalCheckPeriod" name="IncreasePvPRespawnIntervalCheckPeriod" value="{IncreasePvPRespawnIntervalCheckPeriod}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="IncreasePvPRespawnIntervalBaseAmount">Increase PvP Respawn Interval Base Amount:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="IncreasePvPRespawnIntervalBaseAmount" name="IncreasePvPRespawnIntervalBaseAmount" value="{IncreasePvPRespawnIntervalBaseAmount}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ResourceNoReplenishRadiusPlayers">Resource No Replenish Radius Players:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="ResourceNoReplenishRadiusPlayers" name="ResourceNoReplenishRadiusPlayers" value="{ResourceNoReplenishRadiusPlayers}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ResourceNoReplenishRadiusStructures">Resource No Replenish Radius Structures:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="ResourceNoReplenishRadiusStructures" name="ResourceNoReplenishRadiusStructures" value="{ResourceNoReplenishRadiusStructures}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AutoPvEStartTimeSeconds">Auto PvE Start Time Seconds:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="AutoPvEStartTimeSeconds" name="AutoPvEStartTimeSeconds" value="{AutoPvEStartTimeSeconds}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AutoPvEStopTimeSeconds">Auto PvE Stop Time Seconds:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="AutoPvEStopTimeSeconds" name="AutoPvEStopTimeSeconds" value="{AutoPvEStopTimeSeconds}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PhotoModeRangeLimit">Photo Mode Range Limit:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="PhotoModeRangeLimit" name="PhotoModeRangeLimit" value="{PhotoModeRangeLimit}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OverrideMaxExperiencePointsPlayer">Override Max Experience Points Player:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="OverrideMaxExperiencePointsPlayer" name="OverrideMaxExperiencePointsPlayer" value="{OverrideMaxExperiencePointsPlayer}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="OverrideMaxExperiencePointsDino">Override Max Experience Points Dino:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="OverrideMaxExperiencePointsDino" name="OverrideMaxExperiencePointsDino" value="{OverrideMaxExperiencePointsDino}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MaxNumberOfPlayersInTribe">Max Number of Players In Tribe:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" min="0" step="1" id="MaxNumberOfPlayersInTribe" name="MaxNumberOfPlayersInTribe" value="{MaxNumberOfPlayersInTribe}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyImprintingStatScaleMultiplier">Baby Imprinting Stat Scale Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyImprintingStatScaleMultiplier" name="BabyImprintingStatScaleMultiplier" value="{BabyImprintingStatScaleMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyCuddleIntervalMultiplier">Baby Cuddle Interval Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyCuddleIntervalMultiplier" name="BabyCuddleIntervalMultiplier" value="{BabyCuddleIntervalMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyCuddleGracePeriodMultiplier">Baby Cuddle Grace Period Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyCuddleGracePeriodMultiplier" name="BabyCuddleGracePeriodMultiplier" value="{BabyCuddleGracePeriodMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyCuddleLoseImprintQualitySpeedMultiplier">Baby Cuddle Lose Imprint Quality Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyCuddleLoseImprintQualitySpeedMultiplier" name="BabyCuddleLoseImprintQualitySpeedMultiplier" value="{BabyCuddleLoseImprintQualitySpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="GlobalSpoilingTimeMultiplier">Global Spoiling Time Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="GlobalSpoilingTimeMultiplier" name="GlobalSpoilingTimeMultiplier" value="{GlobalSpoilingTimeMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="GlobalItemDecompositionTimeMultiplier">Global Item Decomposition Time Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="GlobalItemDecompositionTimeMultiplier" name="GlobalItemDecompositionTimeMultiplier" value="{GlobalItemDecompositionTimeMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="GlobalCorpseDecompositionTimeMultiplier">Global Corpse Decomposition Time Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="GlobalCorpseDecompositionTimeMultiplier" name="GlobalCorpseDecompositionTimeMultiplier" value="{GlobalCorpseDecompositionTimeMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PvPZoneStructureDamageMultiplier">PvP Zone Structure Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PvPZoneStructureDamageMultiplier" name="PvPZoneStructureDamageMultiplier" value="{PvPZoneStructureDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="IncreasePvPRespawnIntervalMultiplier">Increase PvP Respawn Interval Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="IncreasePvPRespawnIntervalMultiplier" name="IncreasePvPRespawnIntervalMultiplier" value="{IncreasePvPRespawnIntervalMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CropGrowthSpeedMultiplier">Crop Growth Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CropGrowthSpeedMultiplier" name="CropGrowthSpeedMultiplier" value="{CropGrowthSpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="LayEggIntervalMultiplier">Lay Egg Interval Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="LayEggIntervalMultiplier" name="LayEggIntervalMultiplier" value="{LayEggIntervalMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PoopIntervalMultiplier">Poop Interval Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PoopIntervalMultiplier" name="PoopIntervalMultiplier" value="{PoopIntervalMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CropDecaySpeedMultiplier">Crop Decay Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CropDecaySpeedMultiplier" name="CropDecaySpeedMultiplier" value="{CropDecaySpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="MatingIntervalMultiplier">Mating Interval Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="MatingIntervalMultiplier" name="MatingIntervalMultiplier" value="{MatingIntervalMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="EggHatchSpeedMultiplier">Egg Hatch Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="EggHatchSpeedMultiplier" name="EggHatchSpeedMultiplier" value="{EggHatchSpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyMatureSpeedMultiplier">Baby Mature Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyMatureSpeedMultiplier" name="BabyMatureSpeedMultiplier" value="{BabyMatureSpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyFoodConsumptionSpeedMultiplier">Baby Food Consumption Speed Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyFoodConsumptionSpeedMultiplier" name="BabyFoodConsumptionSpeedMultiplier" value="{BabyFoodConsumptionSpeedMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoTurretDamageMultiplier">Dino Turret Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoTurretDamageMultiplier" name="DinoTurretDamageMultiplier" value="{DinoTurretDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="DinoHarvestingDamageMultiplier">Dino Harvesting Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="DinoHarvestingDamageMultiplier" name="DinoHarvestingDamageMultiplier" value="{DinoHarvestingDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PlayerHarvestingDamageMultiplier">Player Harvesting Damage Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PlayerHarvestingDamageMultiplier" name="PlayerHarvestingDamageMultiplier" value="{PlayerHarvestingDamageMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CustomRecipeEffectivenessMultiplier">Custom Recipe Effectiveness Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CustomRecipeEffectivenessMultiplier" name="CustomRecipeEffectivenessMultiplier" value="{CustomRecipeEffectivenessMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CustomRecipeSkillMultiplier">Custom Recipe Skill Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CustomRecipeSkillMultiplier" name="CustomRecipeSkillMultiplier" value="{CustomRecipeSkillMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="KillXPMultiplier">Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="KillXPMultiplier" name="KillXPMultiplier" value="{KillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="HarvestXPMultiplier">Harvest XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="HarvestXPMultiplier" name="HarvestXPMultiplier" value="{HarvestXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CraftXPMultiplier">Craft XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CraftXPMultiplier" name="CraftXPMultiplier" value="{CraftXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="GenericXPMultiplier">Craft XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="GenericXPMultiplier" name="GenericXPMultiplier" value="{GenericXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="SpecialXPMultiplier">Special XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="SpecialXPMultiplier" name="SpecialXPMultiplier" value="{SpecialXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="FuelConsumptionIntervalMultiplier">Fuel Consumption Interval Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="FuelConsumptionIntervalMultiplier" name="FuelConsumptionIntervalMultiplier" value="{FuelConsumptionIntervalMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="ExplorerNoteXPMultiplier">Explorer Note XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="ExplorerNoteXPMultiplier" name="ExplorerNoteXPMultiplier" value="{ExplorerNoteXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BossKillXPMultiplier">Boss Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BossKillXPMultiplier" name="BossKillXPMultiplier" value="{BossKillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="AlphaKillXPMultiplier">Alpha Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="AlphaKillXPMultiplier" name="AlphaKillXPMultiplier" value="{AlphaKillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="WildKillXPMultiplier">Wild Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="WildKillXPMultiplier" name="WildKillXPMultiplier" value="{WildKillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CaveKillXPMultiplier">Cave Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CaveKillXPMultiplier" name="CaveKillXPMultiplier" value="{CaveKillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="TamedKillXPMultiplier">Tamed Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="TamedKillXPMultiplier" name="TamedKillXPMultiplier" value="{TamedKillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="UnclaimedKillXPMultiplier">Unclaimed Kill XP Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="UnclaimedKillXPMultiplier" name="UnclaimedKillXPMultiplier" value="{UnclaimedKillXPMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="SupplyCrateLootQualityMultiplier">Supply Crate Loot Quality Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="SupplyCrateLootQualityMultiplier" name="SupplyCrateLootQualityMultiplier" value="{SupplyCrateLootQualityMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="FishingLootQualityMultiplier">Fishing Loot Quality Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="FishingLootQualityMultiplier" name="FishingLootQualityMultiplier" value="{FishingLootQualityMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="CraftingSkillBonusMultiplier">CraftingS kill Bonus Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="CraftingSkillBonusMultiplier" name="CraftingSkillBonusMultiplier" value="{CraftingSkillBonusMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="BabyImprintAmountMultiplier">Baby Imprint Amount Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="BabyImprintAmountMultiplier" name="BabyImprintAmountMultiplier" value="{BabyImprintAmountMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="RecordDisplay">
+                                <label>
+                                    <span class="FieldName"><label class="control-label" for="PerPlatformMaxStructuresMultiplier">Per Platform Max Structures Multiplier:</label></span>
+                                    <div class="FormInputField">
+                                        <input type="number" step="any" id="PerPlatformMaxStructuresMultiplier" name="PerPlatformMaxStructuresMultiplier" value="{PerPlatformMaxStructuresMultiplier}" />
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-3" class="tabPage">
+                        <table>
+                            <tr>
+                                <td width="67%" valign="top">
+                                    <div class="formField">
+                                        <input type="text" id="AddModId" name="AddModId" style="width: calc(100% - 14px); margin-left: 7px;" />
+                                        <img id="AddModLogo" class="modLogo" />
+                                        <div id="AddModName" class="modName"></div>
+                                        <div id="AddModCategory" class="modCategory"></div>
+                                        <div id="AddModSummary" class="modSummary"></div>
+                                        <br style="clear: both" />
+                                    </div>
+                                </td>
+                                <td valign="top">
+                                    <div class="formValue">
+                                        <input id="AddMod" name="AddMod" type="submit" value="Add Mod" class="secondaryButton" />
+                                        <input id="BrowseMods" name="BrowseMods" type="submit" value="Browse Mods" class="secondaryButton" />
+                                    </div>
+                                </td>
+                            </tr>
+                            {ModsList}
+                        </table>
+                    </div>
+                    {CustomTabPages}
+                </div>
+                <input type="hidden" name="Mods" id="Mods" value="{Mods}" />
+                <input type="hidden" name="DeleteModId" id="DeleteModId" />
+                <div id="footer">
+                    <input id="Restart" name="Restart" type="submit" value="Restart" class="secondaryButton" style="float: left;" />
+                    <input id="Save" name="Save" type="submit" value="Save" class="primaryButton" style="float: right;" />
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

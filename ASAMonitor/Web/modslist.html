@@ -1,0 +1,317 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Page-Exit" content="Alpha(opacity=100)" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mods List</title>
+    <style type="text/css">
+        .no-js #loader {
+            display: none;
+        }
+
+        .js #loader {
+            display: block;
+            position: absolute;
+            left: 100px;
+            top: 0;
+        }
+
+        .se-pre-con {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background-color: #000;
+            opacity: 0.6;
+        }
+
+        .nocontent {
+            display: none;
+        }
+    </style>
+    <link type="text/css" rel="stylesheet" href="styles/jquery-ui.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery-ui.structure.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery-ui.theme.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery-confirm.css" />
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/classic-silver.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jAlert-v4.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jquery.qtip.min.css" />
+    <link type="text/css" rel="stylesheet" href="styles/site.css" />
+    <link type="text/css" rel="stylesheet" href="styles/buttons.css" />
+    <link type="text/css" rel="stylesheet" href="styles/togglebutton.css" />
+    <script type="text/javascript" src="scripts/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.easy-confirm-dialog.js"></script>
+    <script type="text/javascript" src="scripts/jquery-confirm.js"></script>
+    <script type="text/javascript" src="scripts/kendo.all.min.js"></script>
+    <script type="text/javascript" src="scripts/jszip.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="scripts/jquery.qtip.min.js"></script>
+    <script type="text/javascript" src="scripts/jAlert-v4.js"></script>
+    <script type="text/javascript" src="scripts/jAlert-functions.js"></script>
+    <script type="text/javascript" src="scripts/noty/packaged/jquery.noty.packaged.min.js"></script>
+    <script type="text/javascript">
+        <!--
+        var isBlockingScreen = true;
+        function showBlockingScreen(message) {
+            if (!isBlockingScreen) {
+                isBlockingScreen = true;
+                if (message) {
+                    $.blockUI({ message: '<h3 class=\"uiMessage\"><img src="images/loading.gif" /> ' + message + '...</h3>' });
+                } else {
+                    $(".se-pre-con").show();
+                }
+            }
+        }
+        function hideBlockingScreen() {
+            //if (isBlockingScreen)
+            {
+                // Animate loader off screen
+                isBlockingScreen = false;
+                $(".se-pre-con").fadeOut("fast");;
+                $.unblockUI();
+            }
+        }
+        $(window).ready(function () {
+            hideBlockingScreen();
+        });
+        $(window).on('load', function () {
+            //hideBlockingScreen();
+        });
+        $(window).on('unload', function () {
+            //showBlockingScreen();
+        });
+        var ignore_onbeforeunload = false;
+        $('a[href^=mailto]').on('click', function () {
+            ignore_onbeforeunload = true;
+        });
+        window.addEventListener("beforeunload", function (event) {
+            if (!ignore_onbeforeunload) {
+                showBlockingScreen();
+            }
+            ignore_onbeforeunload = false;
+        });
+        function queueMessage(resultText, resultType) {
+            var n = noty({
+                text: resultText,
+                type: resultType,
+                timeout: 5000,
+                layout: 'topRight',
+                theme: 'defaultTheme',
+                animation: {
+                    open: 'animated bounceInRight', // Animate.css class names
+                    close: 'animated bounceOutRight', // Animate.css class names
+                }
+            });
+        }
+        //-->
+    </script>
+    <script type="text/javascript">
+        $(window).on('resize', function () {
+            resizeGrid();
+        });
+        function resizeGrid() {
+            $("#grid").height($(window).height() - $("#header").height() - $("#footer").height() - 22);
+            var grid = $("#grid").data("kendoGrid");
+            if (grid !== null) {
+                if ($(window).width() <= 800) {
+                    grid.hideColumn("summary");
+                    grid.hideColumn("category");
+                    $(".modCategoryGrid").show();
+                    $("#grid .k-grid-header-wrap").find("colgroup col").eq(0).css("width", "");
+                    $("#grid .k-grid-content").find("colgroup col").eq(0).css("width", "");
+                } else {
+                    grid.showColumn("summary");
+                    grid.showColumn("category");
+                    $(".modCategoryGrid").hide();
+                    $("#grid .k-grid-header-wrap").find("colgroup col").eq(0).width("30%");
+                    $("#grid .k-grid-content").find("colgroup col").eq(0).width("30%");
+                }
+                grid.resize();
+            }
+        }
+        $(document).ready(function () {
+            $("#Back").click(function (e) {
+                $("#Mods").val($("#ModsOrig").val());
+            });
+            function isSelected(id) {
+                var mods = $("#Mods").val().split(',');
+                var s = false;
+                mods.forEach(function (number) {
+                    if (parseInt(number) == id) {
+                        s = true;
+                        return;
+                    }
+                });
+                return s;
+            }
+            function onFilterMenuInit(e) {
+                if (e.field === "category") {
+                    var firstValueDropDown = e.container.find("select").eq(0).data("kendoDropDownList");
+                    setTimeout(function () {
+                        firstValueDropDown.wrapper.hide();
+                    });
+                }
+            }
+            function onDataBound(e) {
+                resizeGrid();
+                var selected = $('.selectMod');
+                selected.each(function () {
+                    var id = $(this).attr('data-uid');
+                    $(this).prop('checked', isSelected(parseInt(id)));
+                    $(this).click(function (e) {
+                        var checked = $(this).is(':checked');
+                        var mods = $("#Mods").val().split(',');
+                        if (!checked) {
+                            var pos = mods.indexOf(id);
+                            mods.splice(pos, 1);
+                        } else {
+                            mods.push(id);
+                        }
+                        $("#Mods").val(mods.join(','));
+                    });
+                });
+            }
+            function nameFilter(element) {
+                element.kendoAutoComplete({
+                    dataSource: titles
+                });
+            }
+
+            function categoryFilter(element) {
+                element.kendoDropDownList({
+                    dataSource: categories,
+                    optionLabel: "--Select Category--"
+                });
+            }
+            var categories = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "getCategories.html",
+                        contentType: "text/json",
+                        dataType: "json"
+                    }
+                }
+            });
+            var titles = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "getTitles.html",
+                        contentType: "text/json",
+                        dataType: "json"
+                    }
+                }
+            });
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "getModsList.html",
+                        data: {
+                            selected: $("#Mods").val()
+                        },
+                        contentType: "text/json",
+                        dataType: "json"
+                    }
+                },
+                schema: {
+                    model: {
+                        id: "id"
+                    }
+                },
+                pageSize: 3
+            });
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                height: $("#grid").height($(window).height() - $("#header").height() - $("#footer").height() - 22),
+                editable: false,
+                pageable: true,
+                sortable: true,
+                navigatable: true,
+                resizable: false,
+                reorderable: false,
+                groupable: false,
+                filterable: {
+                    extra: false,
+                    operators: {
+                        string: {
+                            contains: "Contains",
+                            eq: "Is equal to",
+                            neq: "Is not equal to"
+                        }
+                    }
+                },
+                persistSelection: true,
+                dataBound: onDataBound,
+                filterMenuInit: onFilterMenuInit,
+                toolbar: ["search"],
+                columns: [{
+                    field: "sortName",
+                    title: "Name",
+                    template: "<img class='modLogo' src='#=logo#' /><div class='modId'>#=id#</div><div class='modName'>#=name#</div><div class='modCategoryGrid'>#=category#</div>",
+                    width: '30%',
+                    filterable: {
+                        ui: nameFilter
+                    }
+                }, {
+                    field: "category",
+                    title: "Category",
+                    width: '100px',
+                    attributes: {
+                        "class": "modCategory",
+                        "style": "vertical-align: top;",
+                    },
+                    filterable: {
+                        ui: categoryFilter
+                    }
+                }, {
+                    field: "summary",
+                    title: "Summary",
+                    attributes: {
+                        "class": "modSummary",
+                        "style": "vertical-align: top;",
+                    }
+                }, {
+                    filterable: false,
+                    width: "126px",
+                    field: "selected",
+                    attributes: {
+                        "class": "checkbox-align"
+                    },
+                    headerAttributes: {
+                        "class": "checkbox-align"
+                    },
+                    template: "<div class='toggleButton'><label><input type='checkbox' class='selectMod k-select-checkbox k-checkbox k-checkbox-md k-rounded-md' data-role='checkbox' aria-label='Select row' style='width: 120px' data-uid='#=id#' /><span></span></label></div>",
+                    headerTemplate: "Install"
+                }]
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="se-pre-con"></div>
+    <div id="siteWrapper">
+        <div id="header">
+            <img src="images/banner.jpg" style="width: 100%" />
+            <br />
+            <br />
+            <div class="contentMain"><div class="groupBox"><span>Mods List</span></div></div>
+        </div>
+        <div class="contentMain">
+            <div id="gridWrapper">
+                <div id="grid"></div>
+            </div>
+            <form id="formConfig" method="post" action="/index.html#tab-3">
+                {FormFields}
+                <div id="footer">
+                    <input id="Back" name="Back" type="submit" value="Cancel" class="secondaryButton" style="float: left;" />
+                    <input id="UpdateMods" name="UpdateMods" type="submit" value="Update Mods" class="primaryButton" style="float: right;" />
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

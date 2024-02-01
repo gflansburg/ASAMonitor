@@ -1,0 +1,337 @@
+﻿body {
+    font: normal normal normal 14px/normal Arial;
+    margin: 0;
+    padding: 0;
+}
+
+.tabPage {
+    height: 500px;
+    overflow: auto;
+}
+
+.modId {
+    font-weight: bold;
+}
+
+.modName {
+    font-weight: bold;
+}
+
+.modLogo {
+    max-width: 100px;
+    float: left;
+    padding: 0 5px 5px 0;
+}
+
+.modCategory {
+    font-size: 11px;
+    font-weight: normal;
+}
+
+.modCategoryGrid {
+    font-size: 11px;
+    font-weight: normal;
+    display: none;
+}
+
+.modSummary {
+    font-size: 10px;
+    font-weight: normal;
+}
+
+#AddModName,
+#AddModLogo,
+#AddModCategory,
+#AddModSummary {
+    display: none;
+}
+
+.thirdPartyMod {
+    display: none;
+}
+
+.formField {
+    background-color: #DDD;
+    color: black;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.formValue {
+    margin-left: 5px;
+}
+
+.groupBox {
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid silver;
+    line-height: 0em;
+    padding: 0px 10px 0px 30px;
+    max-width: 770px;
+    margin: 30px auto 10px auto;
+}
+
+.groupBox span {
+    background: #fff;
+    padding: 0 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.form-horizontal .control-label {
+    padding-top: 3px;
+    padding-right: 0;
+    margin-bottom: 0px;
+    text-align: right;
+}
+
+.RequiredField {
+    color: red;
+}
+
+.RecordForm span.FormText {
+    clear: left;
+    float: left;
+    text-align: left;
+    padding-bottom: 10px;
+    width: 700px;
+}
+
+
+.RecordForm div {
+    width: 700px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    clear: both;
+    border-top: 1px;
+    border-top-style: dashed;
+    border-top-color: #CCCCCC;
+}
+
+.RecordForm div.PlainField {
+    width: 700px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    clear: both;
+    border-top: 0px;
+    border-top-style: none;
+    border-top-color: #CCCCCC;
+}
+
+.RecordForm span.FormInputField,
+.RecordForm span.FormInputFieldSmall,
+.RecordForm div.FormInputField,
+.RecordForm div.FormInputFieldSmall {
+    display: block;
+    float: left;
+    text-align: left;
+    clear: none;
+}
+
+span.FormInputField,
+div.FormInputField, 
+td.FormInputField {
+    display: block;
+    float: left;
+    text-align: left;
+    clear: none;
+    width: 520px;
+    max-width: 520px;
+}
+
+span.FormInputFieldSmall,
+div.FormInputFieldSmall,
+td.FormInputFieldSmall {
+    display: block;
+    float: left;
+    text-align: left;
+    clear: none;
+    width: 300px;
+}
+
+.RecordForm span.FormRadioInputField,
+.RecordForm div.FormRadioInputField,
+td.FormRadioInputField {
+    display: block;
+    float: left;
+    text-align: left;
+    clear: none;
+}
+
+.RecordForm span.FormInputField input,
+.RecordForm div.FormInputField input,
+td.FormInputField input {
+}
+
+
+.RecordForm label span.FieldName,
+.RecordForm label span.FieldName label {
+    width: 225px;
+    display: block;
+    float: left;
+    text-align: right;
+    font-weight: bold;
+    padding: 5px 5px 5px 5px;
+}
+
+
+.RecordForm label span.FormTwoColumns {
+    width: 475px;
+    padding: 5px 5px 5px 5px;
+    text-align: left;
+    display: block;
+    float: left;
+    clear: none;
+    background: red;
+}
+
+
+.RecordForm label span.FormInstructions, td.FormInstructions {
+    font-weight: Normal;
+    display: block;
+    width: 225px;
+    float: left;
+    text-align: left;
+    clear: none;
+    padding: 3px 0 3px 0;
+}
+
+.RecordForm label span.FormLongColumn {
+    display: block;
+    float: right;
+    width: 485px;
+    margin-right: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: left;
+}
+
+.RecordForm em {
+    text-align: left;
+    font-weight: normal;
+    padding: 5px;
+    color: red;
+}
+
+.RecordForm div span.FormButtonMiddle, .FormButtonMiddle {
+    text-align: center;
+    display: block;
+    padding: 5px 5px 5px 5px;
+    background: #EEE;
+    width: auto;
+    margin: 0 auto;
+}
+
+table.RecordDisplay {
+    clear: left;
+    display: block;
+    float: left;
+    text-align: right;
+    font-weight: bold;
+    margin: 0 0.25em 0.2em 0;
+    padding: 5px;
+}
+
+div.RecordDisplay {
+    width: 100%;
+}
+
+div.RecordDisplay label {
+    width: 100%;
+}
+
+div.RecordDisplay span.FieldName, td.FieldName {
+    clear: left;
+    width: 30%;
+    max-width: 225px;
+    display: block;
+    float: left;
+    text-align: right;
+    font-weight: bold;
+    margin: 1px 5px 5px 0;
+    padding: 6px;
+    padding-bottom: 7px;
+    background: #DDD;
+    min-height: 25px;
+}
+
+div.RecordDisplay span.FieldValue {
+    width: 475px;
+    display: block;
+    float: left;
+    text-align: left;
+    margin: 0 0 0.2em 0;
+    padding: 5px 5px 5px 10px;
+    background: #FFFFFF;
+    font-weight: normal;
+}
+
+.tabPage .FormInputField {
+    max-width: 475px;
+}
+
+.contentMain {
+    padding: 0 10px 0 10px;
+    width: 100%;
+    max-width: 770px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+@media (max-width: 770px) {
+    span.FormInputField,
+    div.FormInputField,
+    td.FormInputField {
+        width: 70%;
+        width: calc(70% - 5px);
+        width: -webkit-calc(70% - 5px);
+        width: -moz-calc(70% - 5px);
+        max-width: 770px;
+    }
+
+    span.FormInputFieldSmall,
+    div.FormInputFieldSmall,
+    td.FormInputFieldSmall {
+        width: 70%;
+        width: calc(70% - 5px);
+        width: -webkit-calc(70% - 5px);
+        width: -moz-calc(70% - 5px);
+        max-width: 300px;
+    }
+
+    .modId {
+        font: normal normal bold 12px/normal Arial;
+    }
+
+    .modName {
+        font: normal normal bold 12px/normal Arial;
+    }
+}
+
+#grid {
+    margin-bottom: 5px;
+}
+
+#tabs {
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+#footer {
+    width: 100%;
+    height: 40px;
+}
+
+.k-grid {
+    height: 100%;
+}
+
+.uiMessage {
+    margin: 15px 15px 15px 15px !important;
+    color: gray;
+}
+
+.uiMessage img {
+    width: 31px;
+}

@@ -556,6 +556,12 @@ namespace ASAMonitor
             {
                 ASAMonitorForm.RestartServer();
             }
+            else if (form["Reset"] != null)
+            {
+                config = ConfigurationSettings.ASAConfig;
+                gus = new GameUserSettings();
+                game = new Game();
+            }
             else if (form["AddMod"] != null)
             {
                 if (form["AddModId"].IsNumber())

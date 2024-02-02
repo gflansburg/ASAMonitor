@@ -144,6 +144,10 @@
             $(".ui-tabs-tab a").on("blur", function () {
                 { ResizeTabs }
             });
+            $("#Reset").easyconfirm({ locale: { title: 'Confirm Reset', text: 'Are you sure you wish to reset your changes?', button: ['No', 'Yes'] } });
+            $("#Reset").click(function () {
+                showBlockingScreen('Resetting Changes');
+            });
             $("#Restart").easyconfirm({ locale: { title: 'Confirm Restart', text: 'Are you sure you wish to restart the server?', button: ['No', 'Yes'] } });
             $("#Restart").click(function () {
                 showBlockingScreen('Restarting Server');
@@ -2291,8 +2295,11 @@
                 <input type="hidden" name="Mods" id="Mods" value="{Mods}" />
                 <input type="hidden" name="DeleteModId" id="DeleteModId" />
                 <div id="footer">
-                    <input id="Restart" name="Restart" type="submit" value="Restart" class="secondaryButton" style="float: left;" />
-                    <input id="Save" name="Save" type="submit" value="Save" class="primaryButton" style="float: right;" />
+                    <input id="Restart" name="Restart" type="submit" value="Restart Server" class="secondaryButton" style="float: left;" />
+                    <div style="display: inline-block; float: right;">
+                        <input id="Reset" name="Reset" type="submit" value="Reset Changes" class="secondaryButton" />
+                        <input id="Save" name="Save" type="submit" value="Save" class="primaryButton" />
+                    </div>
                 </div>
             </form>
         </div>

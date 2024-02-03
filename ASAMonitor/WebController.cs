@@ -259,7 +259,7 @@ namespace ASAMonitor
                 foreach(int id in config.Mods)
                 {
                     CurseForge.Datum mod = Utilities.Mods != null ? Utilities.Mods.FirstOrDefault(m => m.id == id) : null;
-                    sb.Append(string.Format("<tr><td width=\"67%\" valign=\"top\"><div class=\"formField\"><img class=\"modLogo\" src=\"{3}\"{4} /><div style=\"padding: 5px;\"><div class=\"modId\">{0}</div><div class=\"modName\">{1}</div><div class=\"modCategory\">{5}</div><div class=\"modSummary\">{2}</div></div><br style=\"clear: both; height: 0;\" /></div></td><td valign=\"top\"><div class=\"formValue\"><input class=\"DeleteMod\" id=\"DeleteMod_{0}\" name=\"DeleteMod_{0}\" type=\"submit\" value=\"Remove Mod\" class=\"secondaryButton\" data-uid=\"{0}\" data-name=\"{1}\" /></div></td></tr>", id, mod != null ? mod.name.Replace("\"", "&quot;") : string.Empty, mod != null ? mod.summary : string.Empty, mod != null && mod.logo != null ? mod.logo.url : string.Empty, mod == null || mod.logo == null ? " style=\"display: none\"" : string.Empty, mod != null ? mod.categories.FirstOrDefault(c => c.id == mod.primaryCategoryId) != null ? mod.categories.FirstOrDefault(c => c.id == mod.primaryCategoryId).name : string.Empty : string.Empty));
+                    sb.Append(string.Format("<tr><td width=\"67%\" valign=\"top\"><div class=\"formField\"><img class=\"modLogo\" src=\"{3}\"{4} /><div style=\"padding: 5px;\"><div class=\"modId\">{0}</div><{6}{7} class=\"modName\">{1}</{6}><div class=\"modCategory\">{5}</div><div class=\"modSummary\">{2}</div></div><br style=\"clear: both; height: 0;\" /></div></td><td valign=\"top\"><div class=\"formValue\"><input class=\"DeleteMod\" id=\"DeleteMod_{0}\" name=\"DeleteMod_{0}\" type=\"submit\" value=\"Remove Mod\" class=\"secondaryButton\" data-uid=\"{0}\" data-name=\"{1}\" /></div></td></tr>", id, mod != null ? mod.name.Replace("\"", "&quot;") : string.Empty, mod != null ? mod.summary : string.Empty, mod != null && mod.logo != null ? mod.logo.url : string.Empty, mod == null || mod.logo == null ? " style=\"display: none\"" : string.Empty, mod != null ? mod.categories.FirstOrDefault(c => c.id == mod.primaryCategoryId) != null ? mod.categories.FirstOrDefault(c => c.id == mod.primaryCategoryId).name : string.Empty : string.Empty, mod.links != null && !string.IsNullOrEmpty(mod.links.websiteUrl) ? "a" : "div", mod.links != null && !string.IsNullOrEmpty(mod.links.websiteUrl) ? string.Format(" href=\"{0}\" target=\"_blank\" alt=\"{1}\" title=\"{1}\"", mod.links.websiteUrl, "Visit Mod Website") : string.Empty));
                 }
                 html = html.Replace("{ModsList}", sb.ToString());
                 html = html.Replace("{ResizeTabs}", ConfigurationSettings.MobileHideThirdParty ? "resizeTabs();" : string.Empty);
@@ -671,12 +671,13 @@ namespace ASAMonitor
             var data = mods.Select(m => new
             {
                 m.id,
-                m.name,
+                name = m.name.Trim(),
                 m.summary,
                 category = m.categories.FirstOrDefault(c => c.id == m.primaryCategoryId) != null ? m.categories.FirstOrDefault(c => c.id == m.primaryCategoryId).name ?? string.Empty : string.Empty,
                 logo = m.logo != null ? m.logo.thumbnailUrl : string.Empty,
                 sortName = string.Format("{0} ({1})", m.name, m.id),
-                m.displayName
+                m.displayName,
+                url = m.links != null && !string.IsNullOrEmpty(m.links.websiteUrl) ? m.links.websiteUrl : string.Empty
             }).OrderBy(m => m.name);
             string json = JsonConvert.SerializeObject(data);
             return this.StringResponseAsync(json, "text/json");
@@ -690,11 +691,12 @@ namespace ASAMonitor
             var data = Utilities.Mods.Select(m => new
             {
                 m.id,
-                m.name,
+                name = m.name.Trim(),
                 m.summary,
                 category = m.categories.FirstOrDefault(c => c.id == m.primaryCategoryId) != null ? m.categories.FirstOrDefault(c => c.id == m.primaryCategoryId).name ?? string.Empty : string.Empty,
                 logo = m.logo != null ? m.logo.thumbnailUrl : string.Empty,
                 m.displayName,
+                url = m.links != null && !string.IsNullOrEmpty(m.links.websiteUrl) ? m.links.websiteUrl : string.Empty,
                 sortName = string.Format("{0} ({1})", m.name, m.id),
                 selected = selectedIds.Contains(m.id)
             }).OrderBy(m => m.name);

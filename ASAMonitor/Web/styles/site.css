@@ -2,6 +2,7 @@
     font: normal normal normal 14px/normal Arial;
     margin: 0;
     padding: 0;
+    color: black;
 }
 
 .tabPage {
@@ -10,11 +11,24 @@
 }
 
 .modId {
+    font-size: 14px;
     font-weight: bold;
+    color: black;
 }
 
-.modName {
+.modName,
+a.modName,
+a.modName:visited {
     font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+    color: black;
+}
+
+a.modName:active,
+a.modName:focus,
+a.modName:hover {
+    text-decoration: underline;
 }
 
 .modLogo {
@@ -26,6 +40,7 @@
 .modCategory {
     font-size: 11px;
     font-weight: normal;
+    color: black;
 }
 
 .modCategoryGrid {
@@ -37,6 +52,7 @@
 .modSummary {
     font-size: 10px;
     font-weight: normal;
+    color: black;
 }
 
 #AddModName,

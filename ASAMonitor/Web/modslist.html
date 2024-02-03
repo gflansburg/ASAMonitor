@@ -251,7 +251,7 @@
                 columns: [{
                     field: "sortName",
                     title: "Name",
-                    template: "<img class='modLogo' src='#=logo#' /><div class='modId'>#=id#</div><div class='modName'>#=name#</div><div class='modCategoryGrid'>#=category#</div>",
+                    template: "<img class='modLogo' src='#=logo#' /><div class='modId'>#=id#</div><#if (url !== null && url !== '') {#a href=\"#=url#\" target=\"_blank\" alt=\"Visit Mod Website\" title=\"Visit Mod Website\"#} else {#div#}# class='modName'>#=name#</#if (url !== null && url !== '') {#a#} else {#div#}#><div class='modCategoryGrid'>#=category#</div>",
                     width: '30%',
                     filterable: {
                         ui: nameFilter

@@ -52,6 +52,10 @@ namespace ASAMonitor
                 html = html.Replace("{ServerStarted}", ASAMonitorForm.Instance.ServerRunning.ToString().ToLower());
                 html = html.Replace("{Started}", !ASAMonitorForm.Paused ? "checked=\"checked\"" : string.Empty);
                 html = html.Replace("{NoBattleEye}", config.NoBattleEye ? "checked=\"checked\"" : string.Empty);
+                html = html.Replace("{Map}", !string.IsNullOrEmpty(config.Map) ? config.Map : "TheIsland_WP");
+                html = html.Replace("{TheIsland_WP}", config.Map.Equals("TheIsland_WP") ? "selected" : string.Empty);
+                html = html.Replace("{TheCenter_WP}", config.Map.Equals("TheCenter_WP") ? "selected" : string.Empty);
+                html = html.Replace("{ScorchedEarth_WP}", config.Map.Equals("ScorchedEarth_WP") ? "selected" : string.Empty);
                 html = html.Replace("{ForceAllowCaveFlyers}", config.ForceAllowCaveFlyers ? "checked=\"checked\"" : string.Empty);
                 html = html.Replace("{WinLiveMaxPlayers}", config.WinLiveMaxPlayers.ToString());
                 html = html.Replace("{SessionName}", gus.SessionName);
@@ -331,6 +335,7 @@ namespace ASAMonitor
             }
             config.ForceAllowCaveFlyers = !string.IsNullOrEmpty(form["ForceAllowCaveFlyers"]);
             config.NoBattleEye = !string.IsNullOrEmpty(form["NoBattleEye"]);
+            config.Map = form["Map"];
             config.WinLiveMaxPlayers = Convert.ToInt32(form["WinLiveMaxPlayers"]);
             gus.MaxPlayers = Convert.ToInt32(form["WinLiveMaxPlayers"]);
             gus.SessionName = form["SessionName"];

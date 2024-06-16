@@ -12,6 +12,8 @@ namespace ASAMonitor
 
         public bool NoBattleEye { get; set; } = true;
 
+        public string Map { get; set; } = "TheIsland_WP";
+
         public int WinLiveMaxPlayers { get; set; } = 20;
 
         public bool ForceAllowCaveFlyers { get; set; } = true;

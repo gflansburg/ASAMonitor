@@ -67,7 +67,7 @@ namespace ASAMonitor.Properties {
         ///steamcmd +login anonymous +force_install_dir &quot;{1}&quot; +app_update 2430930 validate +quit
         ///echo Starting ARK: Survival Ascended Server...
         ///cd /d &quot;{1}&quot;
-        ///start ShooterGame\Binaries\Win64\ArkAscendedServer.exe {2} -WinLiveMaxPlayers={3} {4} {5} &quot;TheIsland_WP?listen&quot;.
+        ///start ShooterGame\Binaries\Win64\ArkAscendedServer.exe {2} -WinLiveMaxPlayers={3} {4} {5} &quot;{6}?listen&quot;.
         /// </summary>
         internal static string BatchCmd {
             get {

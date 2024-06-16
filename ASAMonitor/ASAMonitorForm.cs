@@ -82,7 +82,7 @@ namespace ASAMonitor
                         StartServer();
                     }
                 }
-                TimeSpan timeRemaining = new TimeSpan(0, 2, 30) - (DateTime.Now - startTime.Value);
+                TimeSpan timeRemaining = new TimeSpan(0, 5, 0) - (DateTime.Now - startTime.Value);
                 lblRemaining.Text = timeRemaining.ToMinimalReadableString();
             }
             if ((DateTime.Now - Utilities.ModLoadTime).TotalHours >= 24)
@@ -147,7 +147,7 @@ namespace ASAMonitor
             ASAConfig config = ConfigurationSettings.ASAConfig;
             string filename = string.Format("{0}\\ASA Start.bat", Utilities.GetExecutingDirectory());
             string mods = config.Mods != null && config.Mods.Count > 0 ? string.Format("-mods={0}", string.Join(",", config.Mods)) : string.Empty;
-            string data = (string.Format(ASAMonitor.Properties.Resources.BatchCmd, ConfigurationSettings.SteamCmdPath, ConfigurationSettings.ASAServerPath, config.NoBattleEye ? "-NoBattlEye" : string.Empty, config.WinLiveMaxPlayers, config.ForceAllowCaveFlyers ? "-ForceAllowCaveFlyers" : string.Empty, mods)).Replace("  ", " ");
+            string data = (string.Format(ASAMonitor.Properties.Resources.BatchCmd, ConfigurationSettings.SteamCmdPath, ConfigurationSettings.ASAServerPath, config.NoBattleEye ? "-NoBattlEye" : string.Empty, config.WinLiveMaxPlayers, config.ForceAllowCaveFlyers ? "-ForceAllowCaveFlyers" : string.Empty, mods, config.Map)).Replace("  ", " ");
             System.IO.File.WriteAllText(filename, data);
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = "cmd.exe";
